@@ -9,7 +9,12 @@
     "account", "new", "login", "signup", "search", "pulls", "issues"
   ]);
 
+  function isImportProgressPath() {
+    return /^\/[^/?#]+\/[^/?#]+\/import\/?$/i.test(window.location.pathname);
+  }
+
   function getRepoDetails() {
+    if (isImportProgressPath()) return null;
     const pathParts = window.location.pathname.split("/").filter(Boolean);
     if (pathParts.length < 2) return null;
 
@@ -303,9 +308,114 @@
     });
   }
 
+  function isGitHubServerErrorPage() {
+    const title = document.title || "";
+    const bodyText = document.body ? document.body.textContent || "" : "";
+    return /Server Error|\b500\b/i.test(title) ||
+      bodyText.includes("Looks like something went wrong!") ||
+      bodyText.includes("We track these errors automatically");
+  }
+
+  async function isRepoReady(task) {
+    if (typeof window.fetch !== "function") return false;
+    try {
+      const response = await window.fetch(task.repoUrl, { credentials: "same-origin", cache: "no-store" });
+      if (!response || !response.ok) return false;
+      if (response.url) {
+        const finalPath = new URL(response.url, window.location.origin).pathname.replace(/\/$/, "").toLowerCase();
+        if (finalPath !== `/${task.fullRepo}`.toLowerCase()) return false;
+      }
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const controller = doc.querySelector('meta[name="route-controller"]')?.getAttribute("content");
+      const nwo = doc.querySelector('meta[name="octolytics-dimension-repository_nwo"]')?.getAttribute("content");
+      const isPublic = doc.querySelector('meta[name="octolytics-dimension-repository_public"]')?.getAttribute("content");
+      return controller === "files" &&
+        typeof nwo === "string" && nwo.toLowerCase() === task.fullRepo.toLowerCase() &&
+        isPublic === "false";
+    } catch {
+      return false;
+    }
+  }
+
+  let importBannerChecked = false;
+  async function checkImportErrorBanner() {
+    if (importBannerChecked || !isImportProgressPath() || !isGitHubServerErrorPage()) return;
+    importBannerChecked = true;
+    try {
+      const response = await chrome.runtime.sendMessage({ action: "GET_SUBMITTED_IMPORT" });
+      const task = response?.success ? response.task : null;
+      if (!task || document.getElementById("f2p-import-banner")) return;
+
+      const banner = document.createElement("div");
+      banner.id = "f2p-import-banner";
+      banner.className = "f2p-banner notranslate";
+      banner.setAttribute("translate", "no");
+      banner.dataset.version = chrome.runtime.getManifest?.()?.version || "1.1.3";
+
+      const content = document.createElement("div");
+      content.className = "f2p-banner-content";
+
+      const left = document.createElement("div");
+      const title = document.createElement("div");
+      title.className = "f2p-banner-title";
+      title.textContent = "已发起私有复制 · 源仓库分支和 PR 记录太多，请耐心等待";
+
+      const desc = document.createElement("div");
+      desc.className = "f2p-banner-desc";
+      desc.textContent = `GitHub 进度页因分支或 PR 记录过多暂时报错（500），但后台仍在继续复制到私有仓库 ${task.fullRepo}（源自 ${task.sourceUrl}），请勿重复点击。正在自动检测完成状态…`;
+      left.append(title, desc);
+
+      const right = document.createElement("div");
+      right.className = "f2p-banner-right";
+
+      const statusText = document.createElement("span");
+      statusText.className = "f2p-countdown-text";
+      statusText.textContent = "后台正在导入，请耐心等待…";
+
+      const openLink = document.createElement("a");
+      openLink.className = "f2p-banner-btn";
+      openLink.href = task.repoUrl;
+      openLink.textContent = `打开私有仓库 (${task.targetName})`;
+
+      right.append(statusText, openLink);
+      content.append(left, right);
+      banner.append(content);
+      document.body.prepend(banner);
+
+      const markReady = () => {
+        banner.classList.add("f2p-banner-success");
+        title.textContent = "已复制成功！源仓库分支和 PR 记录太多，后台已完成导入";
+        desc.textContent = `已确认独立私有仓库 ${task.fullRepo} 代码导入完成（源自 ${task.sourceUrl}），点击右侧按钮即可直接进入仓库。`;
+        statusText.textContent = "已确认私有仓库就绪";
+        openLink.textContent = `进入私有仓库 (${task.targetName})`;
+      };
+
+      if (await isRepoReady(task)) {
+        markReady();
+        return;
+      }
+
+      let attempts = 0;
+      const pollTimer = window.setInterval(async () => {
+        attempts += 1;
+        if (await isRepoReady(task)) {
+          window.clearInterval(pollTimer);
+          markReady();
+        } else if (attempts >= 36) {
+          window.clearInterval(pollTimer);
+          statusText.textContent = "请点击右侧按钮查看仓库状态";
+        }
+      }, 5000);
+    } catch {
+      // Ignore if extension context was invalidated.
+    }
+  }
+
   // Initialize and observe GitHub SPA navigation
   function init() {
     injectButton();
+    checkImportErrorBanner();
 
     // GitHub Turbo / PJAX event listeners
     document.addEventListener("turbo:render", injectButton);

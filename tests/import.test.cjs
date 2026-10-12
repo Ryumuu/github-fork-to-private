@@ -66,7 +66,7 @@ async function page(options={}){
   });
   app.addEventListener('submit',event=>{githubSubmits++;submittedData.push({...appState});nativeGetPrevented=event.defaultPrevented;event.preventDefault();});
  }
- win.chrome={runtime:{getManifest:()=>({version:'1.1.2'}),sendMessage:msg=>w.send(msg,w.sender(a.tabId))}};
+ win.chrome={runtime:{getManifest:()=>({version:'1.1.3'}),sendMessage:msg=>w.send(msg,w.sender(a.tabId))}};
  const nativeTimeout=win.setTimeout.bind(win);
  let now=Date.now();win.Date.now=()=>now;
  win.setTimeout=(fn,ms)=>nativeTimeout(()=>{if(ms===100)now+=100;fn();},ms===10000?20:ms===100?0:ms);
@@ -222,7 +222,7 @@ for(const corrupt of ['missing aria','public aria','stale name','mixed status','
   if(corrupt==='mixed status'){const error=doc.createElement('span');error.id='RepoNameInput-message';error.textContent='demo-private rejected';doc.querySelector('form').append(error);}
   if(corrupt==='invalid input')doc.querySelector('#repository-name-input').setAttribute('aria-invalid','true');
   await p.tick();assert.equal(p.githubSubmits(),0);assert.equal(p.submits(),0);assert.equal(p.w.local.state.history[0].status,'needs_attention');
-  const banner=doc.querySelector('#f2p-import-banner');assert.equal(banner.getAttribute('translate'),'no');assert.match(banner.textContent,/v1\.1\.2/);
+  const banner=doc.querySelector('#f2p-import-banner');assert.equal(banner.getAttribute('translate'),'no');assert.match(banner.textContent,/v1\.1\.3/);
  }finally{p.dom.window.close();}
 });
 test('network errors without the exact candidate name never trigger automatic renaming or submission',async()=>{

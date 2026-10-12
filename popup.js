@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!tab?.url) return showNoRepo();
     const url = new URL(tab.url); const parts = url.pathname.split('/').filter(Boolean);
     const reserved = new Set(['settings','explore','notifications','orgs','marketplace','topics','trending','collections','events','sponsors','account','new','login','signup','search','pulls','issues','users','organizations','features']);
-    if (url.origin !== 'https://github.com' || parts.length < 2 || reserved.has(parts[0].toLowerCase())) return showNoRepo();
+    if (url.origin !== 'https://github.com' || parts.length < 2 || reserved.has(parts[0].toLowerCase()) ||
+        (parts.length === 3 && parts[2].toLowerCase() === 'import')) return showNoRepo();
     currentRepo = F2P.parseRepoUrl(`https://github.com/${parts[0]}/${parts[1]}`);
     byId('current-repo-name').textContent = currentRepo.fullRepo;
     byId('target-repo-name').value = F2P.defaultTargetName(currentRepo.repo, settings.defaultSuffix);

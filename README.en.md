@@ -4,11 +4,11 @@
 
 A Chrome extension that copies a GitHub repository into a separate private repository. It supports GitHub's web-based importer and can generate a script for copying a repository from your local terminal.
 
-Current version: **1.1.2**. Requires Chrome / Chromium 106 or later.
+Current version: **1.1.3**. Requires Chrome / Chromium 106 or later.
 
 This guide is available in Chinese and English. The extension's interface is currently in Chinese; this guide explains the relevant button labels.
 
-**[Download the Chrome extension (1.1.2 ZIP)](https://github.com/ryumu1008/github-fork-to-private/releases/download/v1.1.2/github-fork-to-private-1.1.2.zip)** · [View releases](https://github.com/ryumu1008/github-fork-to-private/releases/latest)
+**[Download the Chrome extension (1.1.3 ZIP)](https://github.com/ryumu1008/github-fork-to-private/releases/download/v1.1.3/github-fork-to-private-1.1.3.zip)** · [View releases](https://github.com/ryumu1008/github-fork-to-private/releases/latest)
 
 ## Installation and updates
 
@@ -17,7 +17,7 @@ This guide is available in Chinese and English. The extension's interface is cur
 1. Download the ZIP using the link above and **extract it to a folder you will keep**. The package includes a Chinese quick-start guide named `安装说明.txt`.
 2. Enter `chrome://extensions` in Chrome's address bar and enable **Developer mode** in the upper-right corner.
 3. Click **Load unpacked** and select the extracted folder **containing `manifest.json`**.
-4. Confirm that the extension shows version **1.1.2**, then refresh any open GitHub pages. You can pin the extension from Chrome's puzzle-piece toolbar menu.
+4. Confirm that the extension shows version **1.1.3**, then refresh any open GitHub pages. You can pin the extension from Chrome's puzzle-piece toolbar menu.
 
 Installation does not require Git, Node.js, npm, or a build step. To install manually in Chrome, extract the ZIP and load its folder; double-clicking the ZIP does not install the extension. See [Chrome's official instructions](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked). Keep the extracted folder in place after installation. Moving or deleting it may prevent the extension from working.
 
@@ -43,14 +43,15 @@ The extension uses the current repository URL, names the copy `original-name-pri
 
 Open **更多选项** (More options) to choose a custom name, copy an upstream repository, or generate local copy commands. A conflicting custom name stops the operation instead of being silently changed. The default suffix can be changed in settings. One-click actions always submit automatically, regardless of an older manual-confirmation setting. The auto-submit setting now applies only to the Manual link mode. Check the account or organization selected as owner on the import page.
 
-Version 1.1.2 fixes false stops caused by page translation. It reads GitHub's rendered visibility state and no longer requires fixed English validation sentences. It still recovers a checked Private radio whose application state remains Public, waits for Private, then fills and verifies the source and name. Bounded preparation retries and final checks remain in place. Editing fields during a manual-link countdown blocks submission.
+Version 1.1.3 adds detection and background readiness polling when GitHub's import progress page (`/<owner>/<repo>/import`) returns an HTTP `500` error: when a source repository has a large number of branches, tags, or historical pull-request refs (for example, over a thousand `refs/pull/*` refs), GitHub's `/import` progress page may show `500 Looks like something went wrong!` even while GitHub's backend continues importing the repository in the background. On that 500 page, the extension now displays a top banner explaining that the copy was submitted and has many branch/PR records so you should wait patiently without clicking again, provides a direct link to the target repository, and checks the target repository page every 5 seconds; once GitHub's repository page confirms the repository is private and its files are ready, the banner updates to confirm completion. Version 1.1.2 fixed false stops caused by page translation and retained Private radio state recovery.
 
-After updating, reload the extension and confirm **1.1.2**, close the old import page, refresh the source repository page, and click once again. Existing import pages do not receive new code automatically. Error banners now show the running version for troubleshooting.
+After updating, reload the extension and confirm **1.1.3**, close the old import page, refresh the source repository page, and click once again. Existing import pages do not receive new code automatically. Error banners now show the running version for troubleshooting.
 
 - Only tasks started by this extension and bound to the current tab and page are accepted. A link constructed outside the extension cannot directly trigger an automatic import.
 - If the complete form cannot be found, the inputs change, or Private visibility cannot be confirmed, the extension stops without submitting.
 - Tasks are stored separately, so opening multiple import pages does not overwrite other tasks.
 - The history status **已发起提交，结果待确认** (Submission requested; result not yet confirmed) only means that submission was requested. **Check GitHub's result page to confirm whether the import succeeded.**
+- If the redirected `/<owner>/<repo>/import` page shows a `500` error, do not click Copy again (which would create `-2`, `-3`, and so on); wait 1–2 minutes for the top banner to confirm completion, or open `https://github.com/<owner>/<repo>` without the trailing `/import`.
 - Importing depends on GitHub's current page structure and service availability. GitHub may require additional authentication for private source repositories; the extension does not read or fill in credentials.
 
 ### Copy from a local terminal
@@ -93,9 +94,9 @@ npm test
 npm run package
 ```
 
-The JavaScript runtime files have no third-party dependencies. jsdom is used only for development tests and is not included in the extension ZIP. Packaging writes `dist/github-fork-to-private-1.1.2.zip` using an explicit file list that excludes `.git`, tests, development dependencies, and local personal files.
+The JavaScript runtime files have no third-party dependencies. jsdom is used only for development tests and is not included in the extension ZIP. Packaging writes `dist/github-fork-to-private-1.1.3.zip` using an explicit file list that excludes `.git`, tests, development dependencies, and local personal files.
 
-The 88 regression tests cover serialized task claiming, tab/page identity checks, concurrent tasks, one-click entry, automatic collision renaming, controlled inputs, both legacy and current import forms, native submit buttons, unsafe input, history rendering, and Bash/Zsh scripts. Automated branch and tag tests use temporary local Git repositories and isolated GitHub command substitutes; they do not create real GitHub repositories.
+The 91 regression tests cover serialized task claiming, tab/page identity checks, concurrent tasks, one-click entry, automatic collision renaming, controlled inputs, both legacy and current import forms, native submit buttons, import-progress 500 banner and readiness checks, unsafe input, history rendering, and Bash/Zsh scripts. Automated branch and tag tests use temporary local Git repositories and isolated GitHub command substitutes; they do not create real GitHub repositories.
 
 Version 1.1.2 was checked with the actual installed extension against GitHub, including automatic numbering, simulated Chinese translations of import-page messages, and delayed network requests. This is not certification of Chrome's built-in translator or every translation extension. See the [1.1.2 verification results](https://github.com/ryumu1008/github-fork-to-private/blob/main/docs/verification/1.1.2.json). Earlier real-service verification of the local copy script is documented in the [1.0.2 results](https://github.com/ryumu1008/github-fork-to-private/blob/main/docs/verification/1.0.2.json). These checks do not guarantee compatibility with future GitHub page changes. Real LFS object migration remains unverified; check GitHub's result for each import.
 

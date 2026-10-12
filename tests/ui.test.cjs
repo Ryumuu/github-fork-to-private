@@ -62,3 +62,56 @@ test('successful primary launch is deduplicated but SPA navigation enables the n
   assert.equal(button.disabled,false);button.click();await until(()=>p.messages.length===2);assert.equal(p.messages[1].data.sourceUrl,'https://github.com/example/second.git');
  }finally{p.dom.window.close();}
 });
+
+test('import progress 500 page shows waiting banner for submitted task and updates when private repository files are ready',async()=>{
+ const html='<title>Server Error · GitHub</title><ul class="pagehead-actions"><li>Fork</li></ul><p>Looks like something went wrong!</p>';
+ const p=setup(html,'https://github.com/ryumu1008/rea-private/import',{},true);
+ try{
+  const ticks=[];p.win.setInterval=fn=>{ticks.push(fn);return ticks.length;};p.win.clearInterval=()=>{};
+  let fetchMode='empty';
+  p.win.fetch=async()=>({
+   ok:fetchMode!=='500',
+   url:'https://github.com/ryumu1008/rea-private',
+   text:async()=>fetchMode==='ready'
+    ?'<meta name="route-controller" content="files"><meta name="octolytics-dimension-repository_nwo" content="ryumu1008/rea-private"><meta name="octolytics-dimension-repository_public" content="false">'
+    :fetchMode==='public'
+    ?'<meta name="route-controller" content="files"><meta name="octolytics-dimension-repository_nwo" content="ryumu1008/rea-private"><meta name="octolytics-dimension-repository_public" content="true">'
+    :'<meta name="route-controller" content="repositories">'
+  });
+  p.win.chrome.runtime.sendMessage=async msg=>{
+   p.messages.push(msg);
+   if(msg.action==='GET_SUBMITTED_IMPORT')return {success:true,task:{id:'t1',sourceUrl:'https://github.com/morluto/rea.git',targetName:'rea-private',owner:'ryumu1008',fullRepo:'ryumu1008/rea-private',repoUrl:'https://github.com/ryumu1008/rea-private'}};
+   return {success:false};
+  };
+  p.win.eval(read('content_repo.js'));
+  await until(()=>p.win.document.getElementById('f2p-import-banner'));
+  assert.equal(p.win.document.getElementById('f2p-private-copy-btn'),null);
+  const banner=p.win.document.getElementById('f2p-import-banner');
+  assert.equal(banner.getAttribute('translate'),'no');
+  assert.match(banner.textContent,/源仓库分支和 PR 记录太多，请耐心等待/);
+  assert.equal(banner.querySelector('.f2p-banner-btn').getAttribute('href'),'https://github.com/ryumu1008/rea-private');
+  await until(()=>ticks.length===1);
+  fetchMode='public';await ticks[0]();
+  assert.equal(banner.classList.contains('f2p-banner-success'),false);
+  fetchMode='ready';await ticks[0]();
+  assert.equal(banner.classList.contains('f2p-banner-success'),true);
+  assert.match(banner.textContent,/已复制成功！源仓库分支和 PR 记录太多，后台已完成导入/);
+ }finally{p.dom.window.close();}
+});
+
+test('unrelated 500 /import page does not show banner and popup does not treat /import as source repository',async()=>{
+ const p=setup('<title>Server Error · GitHub</title><p>Looks like something went wrong!</p>','https://github.com/ryumu1008/rea-private/import');
+ try{
+  p.win.chrome.runtime.sendMessage=async()=>({success:true,task:null});
+  p.win.eval(read('content_repo.js'));
+  await new Promise(r=>setTimeout(r,20));
+  assert.equal(p.win.document.getElementById('f2p-import-banner'),null);
+ }finally{p.dom.window.close();}
+ const pop=setup(read('popup.html'),'https://extension.example/popup.html');
+ try{
+  pop.win.chrome.tabs.query=async()=>[{id:1,url:'https://github.com/ryumu1008/rea-private/import'}];
+  pop.win.eval(read('popup.js'));
+  await until(()=>pop.win.document.getElementById('no-repo-view').style.display==='block');
+  assert.equal(pop.win.document.getElementById('current-repo-view').style.display,'none');
+ }finally{pop.dom.window.close();}
+});

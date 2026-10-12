@@ -453,6 +453,8 @@
 }
 
 .f2p-banner-btn {
+  display: inline-block !important;
+  text-decoration: none !important;
   background: #238636 !important;
   color: #ffffff !important;
   border: 1px solid rgba(240, 246, 252, 0.1) !important;
@@ -466,6 +468,8 @@
 
 .f2p-banner-btn:hover {
   background: #2ea043 !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 .f2p-progress-bar {
@@ -483,4 +487,9 @@
 .f2p-banner-danger {
   background: #250e12 !important;
   border-bottom: 2px solid #f85149 !important;
+}
+
+.f2p-banner-success {
+  background: #0f2419 !important;
+  border-bottom: 2px solid #3fb950 !important;
 }

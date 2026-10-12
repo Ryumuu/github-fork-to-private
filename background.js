@@ -16,6 +16,17 @@ function isImportSender(sender) {
     return url.origin === 'https://github.com' && url.pathname.replace(/\/$/, '') === '/new/import';
   } catch { return false; }
 }
+function parseImportProgressSender(sender) {
+  if (sender.id !== chrome.runtime.id || sender.frameId !== 0 || !sender.tab?.id || !sender.documentId) return null;
+  try {
+    const url = new URL(sender.url);
+    if (url.origin !== 'https://github.com') return null;
+    const match = /^\/([^/?#]+)\/([^/?#]+)\/import\/?$/i.exec(url.pathname);
+    if (!match) return null;
+    const parsed = F2P.parseRepoUrl(`https://github.com/${match[1]}/${match[2]}`);
+    return { owner: parsed.owner, repo: parsed.repo, fullRepo: parsed.fullRepo };
+  } catch { return null; }
+}
 function isStartSender(sender) {
   if (sender.id !== chrome.runtime.id) return false;
   if (sender.url === chrome.runtime.getURL('popup.html')) return true;
@@ -81,6 +92,30 @@ async function dispatch(request, sender) {
     if (sender.id !== chrome.runtime.id || sender.url !== chrome.runtime.getURL('popup.html')) throw new Error('无效来源。');
     await chrome.storage.local.set({ history: [] });
     return { success: true };
+  }
+  if (request.action === 'GET_SUBMITTED_IMPORT') {
+    const progress = parseImportProgressSender(sender);
+    if (!progress) return { success: true, task: null };
+    await pruneTasks();
+    const entries = await chrome.storage.session.get(null);
+    for (const [key, item] of Object.entries(entries)) {
+      if (!key.startsWith(TASK_PREFIX)) continue;
+      if (item.tabId === sender.tab.id && item.state === 'submission_requested' &&
+          item.targetName.toLowerCase() === progress.repo.toLowerCase()) {
+        return {
+          success: true,
+          task: {
+            id: item.id,
+            sourceUrl: item.sourceUrl,
+            targetName: item.targetName,
+            owner: progress.owner,
+            fullRepo: `${progress.owner}/${item.targetName}`,
+            repoUrl: `https://github.com/${progress.owner}/${item.targetName}`
+          }
+        };
+      }
+    }
+    return { success: true, task: null };
   }
   const { key, task } = await getTask(request, sender);
   if (request.action === 'CLAIM_IMPORT') {
