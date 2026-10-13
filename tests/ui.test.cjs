@@ -65,22 +65,22 @@ test('successful primary launch is deduplicated but SPA navigation enables the n
 
 test('import progress 500 page shows waiting banner for submitted task and updates when private repository files are ready',async()=>{
  const html='<title>Server Error · GitHub</title><ul class="pagehead-actions"><li>Fork</li></ul><p>Looks like something went wrong!</p>';
- const p=setup(html,'https://github.com/ryumu1008/rea-private/import',{},true);
+ const p=setup(html,'https://github.com/Ryumuu/rea-private/import',{},true);
  try{
   const ticks=[];p.win.setInterval=fn=>{ticks.push(fn);return ticks.length;};p.win.clearInterval=()=>{};
   let fetchMode='empty';
   p.win.fetch=async()=>({
    ok:fetchMode!=='500',
-   url:'https://github.com/ryumu1008/rea-private',
+   url:'https://github.com/Ryumuu/rea-private',
    text:async()=>fetchMode==='ready'
-    ?'<meta name="route-controller" content="files"><meta name="octolytics-dimension-repository_nwo" content="ryumu1008/rea-private"><meta name="octolytics-dimension-repository_public" content="false">'
+    ?'<meta name="route-controller" content="files"><meta name="octolytics-dimension-repository_nwo" content="Ryumuu/rea-private"><meta name="octolytics-dimension-repository_public" content="false">'
     :fetchMode==='public'
-    ?'<meta name="route-controller" content="files"><meta name="octolytics-dimension-repository_nwo" content="ryumu1008/rea-private"><meta name="octolytics-dimension-repository_public" content="true">'
+    ?'<meta name="route-controller" content="files"><meta name="octolytics-dimension-repository_nwo" content="Ryumuu/rea-private"><meta name="octolytics-dimension-repository_public" content="true">'
     :'<meta name="route-controller" content="repositories">'
   });
   p.win.chrome.runtime.sendMessage=async msg=>{
    p.messages.push(msg);
-   if(msg.action==='GET_SUBMITTED_IMPORT')return {success:true,task:{id:'t1',sourceUrl:'https://github.com/morluto/rea.git',targetName:'rea-private',owner:'ryumu1008',fullRepo:'ryumu1008/rea-private',repoUrl:'https://github.com/ryumu1008/rea-private'}};
+   if(msg.action==='GET_SUBMITTED_IMPORT')return {success:true,task:{id:'t1',sourceUrl:'https://github.com/morluto/rea.git',targetName:'rea-private',owner:'Ryumuu',fullRepo:'Ryumuu/rea-private',repoUrl:'https://github.com/Ryumuu/rea-private'}};
    return {success:false};
   };
   p.win.eval(read('content_repo.js'));
@@ -89,7 +89,7 @@ test('import progress 500 page shows waiting banner for submitted task and updat
   const banner=p.win.document.getElementById('f2p-import-banner');
   assert.equal(banner.getAttribute('translate'),'no');
   assert.match(banner.textContent,/源仓库分支和 PR 记录太多，请耐心等待/);
-  assert.equal(banner.querySelector('.f2p-banner-btn').getAttribute('href'),'https://github.com/ryumu1008/rea-private');
+  assert.equal(banner.querySelector('.f2p-banner-btn').getAttribute('href'),'https://github.com/Ryumuu/rea-private');
   await until(()=>ticks.length===1);
   fetchMode='public';await ticks[0]();
   assert.equal(banner.classList.contains('f2p-banner-success'),false);
@@ -100,7 +100,7 @@ test('import progress 500 page shows waiting banner for submitted task and updat
 });
 
 test('unrelated 500 /import page does not show banner and popup does not treat /import as source repository',async()=>{
- const p=setup('<title>Server Error · GitHub</title><p>Looks like something went wrong!</p>','https://github.com/ryumu1008/rea-private/import');
+ const p=setup('<title>Server Error · GitHub</title><p>Looks like something went wrong!</p>','https://github.com/Ryumuu/rea-private/import');
  try{
   p.win.chrome.runtime.sendMessage=async()=>({success:true,task:null});
   p.win.eval(read('content_repo.js'));
@@ -109,7 +109,7 @@ test('unrelated 500 /import page does not show banner and popup does not treat /
  }finally{p.dom.window.close();}
  const pop=setup(read('popup.html'),'https://extension.example/popup.html');
  try{
-  pop.win.chrome.tabs.query=async()=>[{id:1,url:'https://github.com/ryumu1008/rea-private/import'}];
+  pop.win.chrome.tabs.query=async()=>[{id:1,url:'https://github.com/Ryumuu/rea-private/import'}];
   pop.win.eval(read('popup.js'));
   await until(()=>pop.win.document.getElementById('no-repo-view').style.display==='block');
   assert.equal(pop.win.document.getElementById('current-repo-view').style.display,'none');

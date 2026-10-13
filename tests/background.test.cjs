@@ -96,15 +96,15 @@ test('explicit one-click automatic mode submits despite old manual setting witho
 
 test('GET_SUBMITTED_IMPORT only matches a submitted task on the same tab and target /import page',async()=>{
  const w=worker(),a=await w.start('rea-private'),b=await w.start('other-private');
- const progressSender=(tabId,url='https://github.com/ryumu1008/rea-private/import')=>({id:w.chrome.runtime.id,tab:{id:tabId},frameId:0,documentId:'doc-progress',url});
+ const progressSender=(tabId,url='https://github.com/Ryumuu/rea-private/import')=>({id:w.chrome.runtime.id,tab:{id:tabId},frameId:0,documentId:'doc-progress',url});
  assert.equal((await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(a.tabId))).task,null);
  await w.send({action:'CLAIM_IMPORT',taskId:a.taskId},w.sender(a.tabId));
  assert.equal((await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(a.tabId))).task,null);
  await w.send({action:'IMPORT_STATUS',taskId:a.taskId,status:'submission_requested'},w.sender(a.tabId));
  assert.equal((await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(b.tabId))).task,null);
- assert.equal((await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(a.tabId,'https://github.com/ryumu1008/wrong-private/import'))).task,null);
- assert.equal((await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(a.tabId,'https://github.com/ryumu1008/rea-private'))).task,null);
+ assert.equal((await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(a.tabId,'https://github.com/Ryumuu/wrong-private/import'))).task,null);
+ assert.equal((await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(a.tabId,'https://github.com/Ryumuu/rea-private'))).task,null);
  const matched=await w.send({action:'GET_SUBMITTED_IMPORT'},progressSender(a.tabId));
  assert.equal(matched.success,true);
- assert.deepEqual(JSON.parse(JSON.stringify(matched.task)),{id:a.taskId,sourceUrl:'https://github.com/example/demo.git',targetName:'rea-private',owner:'ryumu1008',fullRepo:'ryumu1008/rea-private',repoUrl:'https://github.com/ryumu1008/rea-private'});
+ assert.deepEqual(JSON.parse(JSON.stringify(matched.task)),{id:a.taskId,sourceUrl:'https://github.com/example/demo.git',targetName:'rea-private',owner:'Ryumuu',fullRepo:'Ryumuu/rea-private',repoUrl:'https://github.com/Ryumuu/rea-private'});
 });

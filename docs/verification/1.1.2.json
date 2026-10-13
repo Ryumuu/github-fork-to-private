@@ -23,7 +23,7 @@
   },
   "browser_tests": [
     {
-      "source": "ryumu1008/github-fork-to-private",
+      "source": "Ryumuu/github-fork-to-private",
       "scenario": "english",
       "interaction": "One repository button click; no import-page input or submit action",
       "github_completion_page_observed": true,
@@ -100,7 +100,7 @@
     "anonymous_download_status": 200,
     "download_bytes_match_local": true,
     "sha256": "d217e6e28418c75357ad3a1f2af0a1f49e06058ade7cbd4817cb3a426e275382",
-    "github_ci": "https://github.com/ryumu1008/github-fork-to-private/actions/runs/36236283186",
+    "github_ci": "https://github.com/Ryumuu/github-fork-to-private/actions/runs/36236283186",
     "github_ci_result": "success"
   },
   "browser_cleanup": {

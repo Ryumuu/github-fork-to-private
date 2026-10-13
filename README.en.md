@@ -8,7 +8,7 @@ Current version: **1.1.3**. Requires Chrome / Chromium 106 or later.
 
 This guide is available in Chinese and English. The extension's interface is currently in Chinese; this guide explains the relevant button labels.
 
-**[Download the Chrome extension (1.1.3 ZIP)](https://github.com/ryumu1008/github-fork-to-private/releases/download/v1.1.3/github-fork-to-private-1.1.3.zip)** · [View releases](https://github.com/ryumu1008/github-fork-to-private/releases/latest)
+**[Download the Chrome extension (1.1.3 ZIP)](https://github.com/Ryumuu/github-fork-to-private/releases/download/v1.1.3/github-fork-to-private-1.1.3.zip)** · [View releases](https://github.com/Ryumuu/github-fork-to-private/releases/latest)
 
 ## Installation and updates
 
@@ -28,7 +28,7 @@ Download and extract the new version, then update the files in the folder you or
 ### Install from source (for developers)
 
 ```sh
-git clone https://github.com/ryumu1008/github-fork-to-private.git
+git clone https://github.com/Ryumuu/github-fork-to-private.git
 ```
 
 Follow the Chrome loading steps above and select the project folder. After updating the source with Git, reload the extension and refresh GitHub pages.
@@ -98,8 +98,8 @@ The JavaScript runtime files have no third-party dependencies. jsdom is used onl
 
 The 91 regression tests cover serialized task claiming, tab/page identity checks, concurrent tasks, one-click entry, automatic collision renaming, controlled inputs, both legacy and current import forms, native submit buttons, import-progress 500 banner and readiness checks, unsafe input, history rendering, and Bash/Zsh scripts. Automated branch and tag tests use temporary local Git repositories and isolated GitHub command substitutes; they do not create real GitHub repositories.
 
-Version 1.1.2 was checked with the actual installed extension against GitHub, including automatic numbering, simulated Chinese translations of import-page messages, and delayed network requests. This is not certification of Chrome's built-in translator or every translation extension. See the [1.1.2 verification results](https://github.com/ryumu1008/github-fork-to-private/blob/main/docs/verification/1.1.2.json). Earlier real-service verification of the local copy script is documented in the [1.0.2 results](https://github.com/ryumu1008/github-fork-to-private/blob/main/docs/verification/1.0.2.json). These checks do not guarantee compatibility with future GitHub page changes. Real LFS object migration remains unverified; check GitHub's result for each import.
+Version 1.1.2 was checked with the actual installed extension against GitHub, including automatic numbering, simulated Chinese translations of import-page messages, and delayed network requests. This is not certification of Chrome's built-in translator or every translation extension. See the [1.1.2 verification results](https://github.com/Ryumuu/github-fork-to-private/blob/main/docs/verification/1.1.2.json). Earlier real-service verification of the local copy script is documented in the [1.0.2 results](https://github.com/Ryumuu/github-fork-to-private/blob/main/docs/verification/1.0.2.json). These checks do not guarantee compatibility with future GitHub page changes. Real LFS object migration remains unverified; check GitHub's result for each import.
 
 ## License and feedback
 
-[MIT License](LICENSE). For security issues, see [SECURITY.md](SECURITY.md) (in Chinese). Changes and verification records are documented in the [change log](https://github.com/ryumu1008/github-fork-to-private/blob/main/修改记录.md) (in Chinese).
+[MIT License](LICENSE). For security issues, see [SECURITY.md](SECURITY.md) (in Chinese). Changes and verification records are documented in the [change log](https://github.com/Ryumuu/github-fork-to-private/blob/main/修改记录.md) (in Chinese).

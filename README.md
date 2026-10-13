@@ -8,7 +8,7 @@ Chrome 扩展：将 GitHub 仓库复制到独立的私有仓库。支持 GitHub 
 
 本说明提供中文和英文版本；扩展界面目前为中文。
 
-**[下载 Chrome 扩展安装包（1.1.3 ZIP）](https://github.com/ryumu1008/github-fork-to-private/releases/download/v1.1.3/github-fork-to-private-1.1.3.zip)** · [查看发布版本](https://github.com/ryumu1008/github-fork-to-private/releases/latest)
+**[下载 Chrome 扩展安装包（1.1.3 ZIP）](https://github.com/Ryumuu/github-fork-to-private/releases/download/v1.1.3/github-fork-to-private-1.1.3.zip)** · [查看发布版本](https://github.com/Ryumuu/github-fork-to-private/releases/latest)
 
 ## 安装与更新
 
@@ -28,7 +28,7 @@ Chrome 扩展：将 GitHub 仓库复制到独立的私有仓库。支持 GitHub 
 ### 从源码安装（开发者）
 
 ```sh
-git clone https://github.com/ryumu1008/github-fork-to-private.git
+git clone https://github.com/Ryumuu/github-fork-to-private.git
 ```
 
 按上面的 Chrome 加载步骤选择项目目录即可。Git 更新源码后，也需要重新加载扩展并刷新 GitHub 页面。
@@ -98,8 +98,8 @@ JS 运行文件无第三方依赖；jsdom 仅用于开发测试，不进入扩�
 
 91 项回归测试覆盖任务串行领取、标签页/页面身份验证、并发、一键入口、同名改名、受控输入、新旧导入表单、原生按钮、导入进度页 500 提示与就绪检测、危险输入、历史呈现及 Bash/Zsh 脚本。自动化测试中的 Git 分支/标签检查使用临时本地仓库和隔离的 GitHub 命令替身，不创建真实 GitHub 仓库。
 
-1.1.2 已用实际加载的扩展进行真实 GitHub 一键复制验证，包括自动编号，以及在导入页模拟中文翻译和延迟网络请求；这不是对 Chrome 内置翻译或所有翻译插件的逐一兼容认证。验证记录见 [1.1.2 验证结果](https://github.com/ryumu1008/github-fork-to-private/blob/main/docs/verification/1.1.2.json)。此前本地复制的真实 GitHub 验证见 [1.0.2 记录](https://github.com/ryumu1008/github-fork-to-private/blob/main/docs/verification/1.0.2.json)。测试不代表未来 GitHub 页面改版仍兼容；真实 LFS 数据迁移尚未验证，每次导入仍须查看 GitHub 的结果。
+1.1.2 已用实际加载的扩展进行真实 GitHub 一键复制验证，包括自动编号，以及在导入页模拟中文翻译和延迟网络请求；这不是对 Chrome 内置翻译或所有翻译插件的逐一兼容认证。验证记录见 [1.1.2 验证结果](https://github.com/Ryumuu/github-fork-to-private/blob/main/docs/verification/1.1.2.json)。此前本地复制的真实 GitHub 验证见 [1.0.2 记录](https://github.com/Ryumuu/github-fork-to-private/blob/main/docs/verification/1.0.2.json)。测试不代表未来 GitHub 页面改版仍兼容；真实 LFS 数据迁移尚未验证，每次导入仍须查看 GitHub 的结果。
 
 ## 许可与反馈
 
-[MIT License](LICENSE)。安全问题请参阅 [SECURITY.md](SECURITY.md)。修改与验证记录见 [修改记录.md](https://github.com/ryumu1008/github-fork-to-private/blob/main/修改记录.md)。
+[MIT License](LICENSE)。安全问题请参阅 [SECURITY.md](SECURITY.md)。修改与验证记录见 [修改记录.md](https://github.com/Ryumuu/github-fork-to-private/blob/main/修改记录.md)。
